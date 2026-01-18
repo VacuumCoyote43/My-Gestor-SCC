@@ -1,16 +1,33 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import SearchFilter from '@/Components/SearchFilter.vue';
+import Card from '@/Components/Card.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
-defineProps({
+const props = defineProps({
     users: Object,
     filters: Object,
 });
+
+const roleFilter = ref(props.filters.role || '');
+const activeFilter = ref(props.filters.active || '');
 
 const loginAs = (userId) => {
     if (confirm('¿Estás seguro de que quieres iniciar sesión como este usuario?')) {
         router.post(route('admin.users.login-as', userId));
     }
+};
+
+const applyFilters = () => {
+    router.get(route('admin.users.index'), {
+        search: props.filters.search,
+        role: roleFilter.value,
+        active: activeFilter.value,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -23,15 +40,57 @@ const loginAs = (userId) => {
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
                     Gestión de Usuarios
                 </h2>
-                <Link :href="route('admin.users.create')" class="inline-flex items-center px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                <Link :href="route('admin.users.create')" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/50 transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl hover:shadow-primary-500/50 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-95">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
                     Nuevo Usuario
                 </Link>
             </div>
         </template>
 
-        <div class="py-12">
+        <div class="py-8">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <!-- Buscador -->
+                <SearchFilter
+                    :filters="filters"
+                    route-name="admin.users.index"
+                    placeholder="Buscar usuarios por nombre o email..."
+                    :show-filters="true"
+                >
+                    <template #filters>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+                                <select
+                                    v-model="roleFilter"
+                                    @change="applyFilters"
+                                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                >
+                                    <option value="">Todos los roles</option>
+                                    <option value="admin">Administrador</option>
+                                    <option value="proveedor">Proveedor</option>
+                                    <option value="gestor_club">Gestor Club</option>
+                                    <option value="jugador">Jugador</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                                <select
+                                    v-model="activeFilter"
+                                    @change="applyFilters"
+                                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                >
+                                    <option value="">Todos</option>
+                                    <option value="true">Activos</option>
+                                    <option value="false">Inactivos</option>
+                                </select>
+                            </div>
+                        </div>
+                    </template>
+                </SearchFilter>
+
+                <Card :padding="false">
                     <div class="p-6">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -88,7 +147,7 @@ const loginAs = (userId) => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

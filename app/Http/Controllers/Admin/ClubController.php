@@ -19,14 +19,18 @@ class ClubController extends Controller
      */
     public function index(Request $request): Response
     {
-        $query = Club::with('createdBy');
+        $query = Club::with('createdBy', 'gestor');
 
         if ($request->filled('search')) {
-            $query->where('nombre', 'like', '%' . $request->search . '%')
-                  ->orWhere('cif', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('cif', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
         }
 
-        $clubes = $query->orderBy('created_at', 'desc')->paginate(15);
+        $clubes = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Clubes/Index', [
             'clubes' => $clubes,

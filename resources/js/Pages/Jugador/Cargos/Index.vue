@@ -1,11 +1,17 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import SearchFilter from '@/Components/SearchFilter.vue';
+import Card from '@/Components/Card.vue';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
-defineProps({
+const props = defineProps({
     cargos: Object,
     filters: Object,
 });
+
+const estadoFilter = ref(props.filters.estado || '');
+const mesFilter = ref(props.filters.mes || '');
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('es-ES', {
@@ -35,6 +41,16 @@ const getEstadoLabel = (estado) => {
     };
     return labels[estado] || estado;
 };
+
+const applyFilters = () => {
+    router.get(route('jugador.cargos.index'), {
+        estado: estadoFilter.value,
+        mes: mesFilter.value,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -47,9 +63,57 @@ const getEstadoLabel = (estado) => {
             </h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-8">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <!-- Filtros -->
+                <SearchFilter
+                    :filters="filters"
+                    route-name="jugador.cargos.index"
+                    placeholder="Buscar por club..."
+                    :show-filters="true"
+                >
+                    <template #filters>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                                <select
+                                    v-model="estadoFilter"
+                                    @change="applyFilters"
+                                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                >
+                                    <option value="">Todos los estados</option>
+                                    <option value="pending_payment">Pendiente de Pago</option>
+                                    <option value="payment_registered">Pago Registrado</option>
+                                    <option value="paid">Pagado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Mes</label>
+                                <select
+                                    v-model="mesFilter"
+                                    @change="applyFilters"
+                                    class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                                >
+                                    <option value="">Todos los meses</option>
+                                    <option value="1">Enero</option>
+                                    <option value="2">Febrero</option>
+                                    <option value="3">Marzo</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Mayo</option>
+                                    <option value="6">Junio</option>
+                                    <option value="7">Julio</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                            </div>
+                        </div>
+                    </template>
+                </SearchFilter>
+
+                <Card :padding="false">
                     <div class="p-6">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -98,7 +162,7 @@ const getEstadoLabel = (estado) => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

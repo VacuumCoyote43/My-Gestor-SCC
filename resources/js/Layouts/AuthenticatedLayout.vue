@@ -28,7 +28,7 @@ const stopImpersonating = () => {
     <div>
         <FlashMessages />
         
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-gray-50">
             <!-- Banner de impersonación -->
             <div v-if="isImpersonating" class="bg-yellow-500 text-white px-4 py-2 text-center">
                 <span class="font-semibold">Estás viendo la aplicación como otro usuario.</span>
@@ -38,7 +38,7 @@ const stopImpersonating = () => {
             </div>
 
             <nav
-                class="border-b border-gray-100 bg-white"
+                class="bg-white shadow-sm border-b border-gray-200"
             >
                 <!-- Primary Navigation Menu -->
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -277,16 +277,18 @@ const stopImpersonating = () => {
 
             <!-- Page Heading -->
             <header
-                class="bg-white shadow"
+                class="bg-gradient-to-r from-primary-600 to-primary-700 shadow-lg"
                 v-if="$slots.header"
             >
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
+                    <div class="text-white">
+                        <slot name="header" />
+                    </div>
                 </div>
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="bg-gray-50">
                 <slot />
             </main>
         </div>

@@ -22,21 +22,32 @@ class UserController extends Controller
     {
         $query = User::with('role');
 
+        // Búsqueda por nombre o email
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtro por rol
         if ($request->filled('role')) {
             $query->whereHas('role', function($q) use ($request) {
                 $q->where('nombre', $request->role);
             });
         }
 
+        // Filtro por estado activo
         if ($request->filled('active')) {
             $query->where('active', $request->active === 'true');
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate(15);
+        $users = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
-            'filters' => $request->only(['role', 'active']),
+            'filters' => $request->only(['search', 'role', 'active']),
         ]);
     }
 

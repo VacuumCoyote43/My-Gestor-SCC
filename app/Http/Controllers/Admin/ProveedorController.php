@@ -22,11 +22,15 @@ class ProveedorController extends Controller
         $query = Proveedor::with('createdBy');
 
         if ($request->filled('search')) {
-            $query->where('nombre_legal', 'like', '%' . $request->search . '%')
-                  ->orWhere('nif_cif', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre_legal', 'like', "%{$search}%")
+                  ->orWhere('nif_cif', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
         }
 
-        $proveedores = $query->orderBy('created_at', 'desc')->paginate(15);
+        $proveedores = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Admin/Proveedores/Index', [
             'proveedores' => $proveedores,

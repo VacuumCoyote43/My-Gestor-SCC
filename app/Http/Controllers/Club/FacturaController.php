@@ -50,19 +50,33 @@ class FacturaController extends Controller
             ->where('emisor_type', Club::class)
             ->where('emisor_id', $club->id);
 
+        // Búsqueda por número de factura o receptor
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero', 'like', "%{$search}%")
+                  ->orWhereHasMorph('receptor', [Club::class, Proveedor::class], function($q) use ($search) {
+                      $q->where('nombre', 'like', "%{$search}%")
+                        ->orWhere('nombre_legal', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filtro por estado
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
+        // Filtro por mes
         if ($request->filled('mes')) {
             $query->whereMonth('fecha_factura', $request->mes);
         }
 
-        $facturas = $query->orderBy('created_at', 'desc')->paginate(15);
+        $facturas = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Club/Facturas/Index', [
             'facturas' => $facturas,
-            'filters' => $request->only(['estado', 'mes']),
+            'filters' => $request->only(['search', 'estado', 'mes']),
             'club' => $club,
         ]);
     }

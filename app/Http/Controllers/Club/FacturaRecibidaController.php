@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Club;
 
 use App\Http\Controllers\Controller;
 use App\Models\Factura;
+use App\Models\Club;
+use App\Models\Proveedor;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,40 +19,51 @@ class FacturaRecibidaController extends Controller
      */
     public function index(Request $request): Response
     {
-        // TODO: Filtrar por clubes del gestor actual
-        // Por ahora mostramos todas las facturas donde receptor es Club
-        $query = Factura::where('receptor_type', 'App\\Models\\Club')
-            ->with(['emisor', 'conceptos', 'pagos']);
-
-        // Filtros
-        if ($request->filled('estado')) {
-            $query->where('estado', $request->estado);
-        }
-
-        if ($request->filled('mes')) {
-            $query->whereMonth('fecha_factura', $request->mes);
-        }
-
-        if ($request->filled('anio')) {
-            $query->whereYear('fecha_factura', $request->anio);
-        }
-
         // Obtener el club del usuario para mostrar en la vista
         $user = auth()->user();
-        $club = \App\Models\Club::where('gestor_id', $user->id)->first();
+        $club = Club::where('gestor_id', $user->id)->first();
 
         if (!$club) {
             abort(403, 'No tienes un club asignado.');
         }
 
         // Filtrar solo facturas recibidas por el club del gestor
-        $query->where('receptor_id', $club->id);
+        $query = Factura::where('receptor_type', Club::class)
+            ->where('receptor_id', $club->id)
+            ->with(['emisor', 'conceptos', 'pagos']);
 
-        $facturas = $query->orderBy('created_at', 'desc')->paginate(15);
+        // Búsqueda por número de factura o emisor
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero', 'like', "%{$search}%")
+                  ->orWhereHasMorph('emisor', [Club::class, Proveedor::class], function($q) use ($search) {
+                      $q->where('nombre', 'like', "%{$search}%")
+                        ->orWhere('nombre_legal', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filtro por estado
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
+        // Filtro por mes
+        if ($request->filled('mes')) {
+            $query->whereMonth('fecha_factura', $request->mes);
+        }
+
+        // Filtro por año
+        if ($request->filled('anio')) {
+            $query->whereYear('fecha_factura', $request->anio);
+        }
+
+        $facturas = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Club/FacturasRecibidas/Index', [
             'facturas' => $facturas,
-            'filters' => $request->only(['estado', 'mes', 'anio']),
+            'filters' => $request->only(['search', 'estado', 'mes', 'anio']),
             'club' => $club,
         ]);
     }

@@ -45,24 +45,38 @@ class FacturaController extends Controller
             ->where('emisor_id', $proveedor->id)
             ->with(['receptor', 'conceptos', 'pagos']);
 
-        // Filtros
+        // Búsqueda por número de factura o receptor
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero', 'like', "%{$search}%")
+                  ->orWhereHasMorph('receptor', [Club::class, Proveedor::class], function($q) use ($search) {
+                      $q->where('nombre', 'like', "%{$search}%")
+                        ->orWhere('nombre_legal', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filtro por estado
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
+        // Filtro por mes
         if ($request->filled('mes')) {
             $query->whereMonth('fecha_factura', $request->mes);
         }
 
+        // Filtro por año
         if ($request->filled('anio')) {
             $query->whereYear('fecha_factura', $request->anio);
         }
 
-        $facturas = $query->orderBy('created_at', 'desc')->paginate(15);
+        $facturas = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Proveedor/Facturas/Index', [
             'facturas' => $facturas,
-            'filters' => $request->only(['estado', 'mes', 'anio']),
+            'filters' => $request->only(['search', 'estado', 'mes', 'anio']),
         ]);
     }
 

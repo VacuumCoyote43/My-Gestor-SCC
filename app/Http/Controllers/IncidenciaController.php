@@ -38,19 +38,32 @@ class IncidenciaController extends Controller
             $query->where('user_id_creador', Auth::id());
         }
 
+        // Búsqueda por asunto
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('asunto', 'like', "%{$search}%");
+        }
+
+        // Filtro por estado
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
+        // Filtro por prioridad
         if ($request->filled('prioridad')) {
             $query->where('prioridad', $request->prioridad);
         }
 
-        $incidencias = $query->orderBy('created_at', 'desc')->paginate(15);
+        // Filtro por categoría
+        if ($request->filled('categoria')) {
+            $query->where('categoria', $request->categoria);
+        }
+
+        $incidencias = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Incidencias/Index', [
             'incidencias' => $incidencias,
-            'filters' => $request->only(['estado', 'prioridad']),
+            'filters' => $request->only(['search', 'estado', 'prioridad', 'categoria']),
         ]);
     }
 

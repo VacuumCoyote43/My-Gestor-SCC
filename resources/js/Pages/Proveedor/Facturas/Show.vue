@@ -61,7 +61,10 @@ const rechazarPago = (pagoId) => {
                     Factura {{ factura.numero }}
                 </h2>
                 <div class="flex gap-2">
-                    <Link v-if="factura.estado === 'draft'" :href="route('proveedor.facturas.edit', factura.id)" class="inline-flex items-center px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                    <Link v-if="factura.estado === 'draft'" :href="route('proveedor.facturas.edit', factura.id)" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/50 transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl hover:shadow-primary-500/50 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-95">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
                         Editar
                     </Link>
                     <PrimaryButton v-if="factura.estado === 'draft'" @click="emitirFactura" :disabled="emitForm.processing">
@@ -203,10 +206,16 @@ const rechazarPago = (pagoId) => {
                                     </span>
                                 </div>
                                 <div v-if="pago.estado_pago === 'registrado'" class="flex gap-2 mt-2">
-                                    <button @click="validarPago(pago.id)" class="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700">
+                                    <button @click="validarPago(pago.id)" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-green-600 to-green-700 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-green-500/50 transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:shadow-xl hover:shadow-green-500/50 focus:outline-none focus:ring-4 focus:ring-green-300 active:scale-95">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
                                         Validar
                                     </button>
-                                    <button @click="rechazarPago(pago.id)" class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
+                                    <button @click="rechazarPago(pago.id)" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/50 transition-all duration-200 hover:from-red-700 hover:to-red-800 hover:shadow-xl hover:shadow-red-500/50 focus:outline-none focus:ring-4 focus:ring-red-300 active:scale-95">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                         Rechazar
                                     </button>
                                 </div>

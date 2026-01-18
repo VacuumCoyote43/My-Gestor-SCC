@@ -21,15 +21,29 @@ class CargoController extends Controller
         $query = CargoJugador::where('user_id_jugador', Auth::id())
             ->with(['club', 'conceptos', 'pagos']);
 
+        // Búsqueda por nombre de club
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('club', function($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtro por estado
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
-        $cargos = $query->orderBy('created_at', 'desc')->paginate(15);
+        // Filtro por mes
+        if ($request->filled('mes')) {
+            $query->whereMonth('fecha_emision', $request->mes);
+        }
+
+        $cargos = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Jugador/Cargos/Index', [
             'cargos' => $cargos,
-            'filters' => $request->only(['estado']),
+            'filters' => $request->only(['search', 'estado', 'mes']),
         ]);
     }
 
