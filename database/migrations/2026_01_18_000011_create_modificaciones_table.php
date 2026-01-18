@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('modifiable_type');
             $table->unsignedBigInteger('modifiable_id');
-            $table->string('action');
-            $table->json('changes');
-            $table->text('comment')->nullable();
+            $table->string('accion');
+            $table->json('cambios');
+            $table->text('comentario')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();

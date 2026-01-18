@@ -1,18 +1,42 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import FlashMessages from '@/Components/FlashMessages.vue';
+import { Link, usePage, router } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
+const page = usePage();
+
+const isImpersonating = computed(() => {
+    return page.props.auth?.is_impersonating || false;
+});
+
+const userRole = computed(() => {
+    return page.props.auth?.user?.role?.nombre || '';
+});
+
+const stopImpersonating = () => {
+    router.post(route('stop-impersonating'));
+};
 </script>
 
 <template>
     <div>
+        <FlashMessages />
+        
         <div class="min-h-screen bg-gray-100">
+            <!-- Banner de impersonación -->
+            <div v-if="isImpersonating" class="bg-yellow-500 text-white px-4 py-2 text-center">
+                <span class="font-semibold">Estás viendo la aplicación como otro usuario.</span>
+                <button @click="stopImpersonating" class="ml-4 underline hover:no-underline">
+                    Volver a mi cuenta de administrador
+                </button>
+            </div>
+
             <nav
                 class="border-b border-gray-100 bg-white"
             >
@@ -38,6 +62,78 @@ const showingNavigationDropdown = ref(false);
                                     :active="route().current('dashboard')"
                                 >
                                     Dashboard
+                                </NavLink>
+
+                                <!-- Enlaces Admin -->
+                                <template v-if="userRole === 'admin'">
+                                    <NavLink
+                                        :href="route('admin.users.index')"
+                                        :active="route().current('admin.users.*')"
+                                    >
+                                        Usuarios
+                                    </NavLink>
+                                    <NavLink
+                                        :href="route('admin.clubes.index')"
+                                        :active="route().current('admin.clubes.*')"
+                                    >
+                                        Clubes
+                                    </NavLink>
+                                    <NavLink
+                                        :href="route('admin.proveedores.index')"
+                                        :active="route().current('admin.proveedores.*')"
+                                    >
+                                        Proveedores
+                                    </NavLink>
+                                </template>
+
+                                <!-- Enlaces Proveedor -->
+                                <template v-if="userRole === 'proveedor'">
+                                    <NavLink
+                                        :href="route('proveedor.facturas.index')"
+                                        :active="route().current('proveedor.facturas.*')"
+                                    >
+                                        Facturas
+                                    </NavLink>
+                                </template>
+
+                                <!-- Enlaces Gestor Club -->
+                                <template v-if="userRole === 'gestor_club'">
+                                    <NavLink
+                                        :href="route('club.facturas.index')"
+                                        :active="route().current('club.facturas.*')"
+                                    >
+                                        Facturas Emitidas
+                                    </NavLink>
+                                    <NavLink
+                                        :href="route('club.facturas-recibidas.index')"
+                                        :active="route().current('club.facturas-recibidas.*')"
+                                    >
+                                        Facturas Recibidas
+                                    </NavLink>
+                                    <NavLink
+                                        :href="route('club.cargos.index')"
+                                        :active="route().current('club.cargos.*')"
+                                    >
+                                        Cargos Jugadores
+                                    </NavLink>
+                                </template>
+
+                                <!-- Enlaces Jugador -->
+                                <template v-if="userRole === 'jugador'">
+                                    <NavLink
+                                        :href="route('jugador.cargos.index')"
+                                        :active="route().current('jugador.cargos.*')"
+                                    >
+                                        Mis Cargos
+                                    </NavLink>
+                                </template>
+
+                                <!-- Incidencias (todos los roles) -->
+                                <NavLink
+                                    :href="route('incidencias.index')"
+                                    :active="route().current('incidencias.*')"
+                                >
+                                    Incidencias
                                 </NavLink>
                             </div>
                         </div>

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('docs', function (Blueprint $table) {
+        Schema::create('archivo_adjuntos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre_original');
             $table->string('ruta');
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('docs');
+        Schema::dropIfExists('archivo_adjuntos');
     }
 };

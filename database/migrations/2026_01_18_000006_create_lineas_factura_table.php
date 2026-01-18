@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lineas_factura', function (Blueprint $table) {
+        Schema::create('factura_conceptos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('factura_id')->constrained('facturas')->cascadeOnDelete();
             $table->string('descripcion');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lineas_factura');
+        Schema::dropIfExists('factura_conceptos');
     }
 };
