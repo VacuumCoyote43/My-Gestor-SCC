@@ -1,7 +1,9 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SearchFilter from '@/Components/SearchFilter.vue';
-import Card from '@/Components/Card.vue';
+import DataTable from '@/Components/DataTable.vue';
+import Badge from '@/Components/Badge.vue';
+import Pagination from '@/Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -14,6 +16,15 @@ const props = defineProps({
 const estadoFilter = ref(props.filters.estado || '');
 const mesFilter = ref(props.filters.mes || '');
 
+const columns = [
+    { key: 'numero', label: 'Número', sortable: true },
+    { key: 'receptor', label: 'Receptor', sortable: false },
+    { key: 'fecha_factura', label: 'Fecha', sortable: true },
+    { key: 'total', label: 'Total', sortable: true, class: 'text-right', rowClass: 'text-right font-medium' },
+    { key: 'estado', label: 'Estado', sortable: true, class: 'text-center', rowClass: 'text-center' },
+    { key: 'actions', label: 'Acciones', sortable: false, class: 'text-right', rowClass: 'text-right' },
+];
+
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('es-ES', {
         style: 'currency',
@@ -21,22 +32,22 @@ const formatCurrency = (value) => {
     }).format(value);
 };
 
-const getEstadoBadgeClass = (estado) => {
-    const classes = {
-        'draft': 'bg-gray-100 text-gray-800',
-        'pending_payment': 'bg-yellow-100 text-yellow-800',
-        'payment_registered': 'bg-blue-100 text-blue-800',
-        'paid': 'bg-green-100 text-green-800',
-        'cancelled': 'bg-red-100 text-red-800',
+const getEstadoColor = (estado) => {
+    const colors = {
+        'draft': 'gray',
+        'pending_payment': 'yellow',
+        'payment_registered': 'blue',
+        'paid': 'green',
+        'cancelled': 'red',
     };
-    return classes[estado] || 'bg-gray-100 text-gray-800';
+    return colors[estado] || 'gray';
 };
 
 const getEstadoLabel = (estado) => {
     const labels = {
         'draft': 'Borrador',
-        'pending_payment': 'Pendiente Pago',
-        'payment_registered': 'Pago Registrado',
+        'pending_payment': 'Pendiente',
+        'payment_registered': 'Verificando',
         'paid': 'Pagada',
         'cancelled': 'Cancelada',
     };
@@ -48,6 +59,9 @@ const applyFilters = () => {
         search: props.filters.search,
         estado: estadoFilter.value,
         mes: mesFilter.value,
+        // Preserve sort if present
+        sort: props.filters.sort,
+        direction: props.filters.direction,
     }, {
         preserveState: true,
         preserveScroll: true,
@@ -61,7 +75,7 @@ const applyFilters = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                <h2 class="text-xl font-semibold leading-tight text-white">
                     Facturas Emitidas{{ club ? ' - ' + club.nombre : '' }}
                 </h2>
                 <Link :href="route('club.facturas.create')" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/50 transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl hover:shadow-primary-500/50 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-95">
@@ -81,6 +95,7 @@ const applyFilters = () => {
                     route-name="club.facturas.index"
                     placeholder="Buscar facturas por número o receptor..."
                     :show-filters="true"
+                    class="mb-6"
                 >
                     <template #filters>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -125,65 +140,52 @@ const applyFilters = () => {
                     </template>
                 </SearchFilter>
 
-                <Card :padding="false">
-                    <div class="p-6">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Número</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Receptor</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Total</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="factura in facturas.data" :key="factura.id">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            {{ factura.numero || 'BORRADOR' }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ factura.receptor?.nombre || factura.receptor?.nombre_legal }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ new Date(factura.fecha_factura).toLocaleDateString('es-ES') }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm font-medium text-right text-gray-900 whitespace-nowrap">
-                                            {{ formatCurrency(factura.total) }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="getEstadoBadgeClass(factura.estado)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                                {{ factura.estado }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
-                                            <Link :href="route('club.facturas.show', factura.id)" class="text-blue-600 hover:text-blue-900">
-                                                Ver
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                    <tr v-if="facturas.data.length === 0">
-                                        <td colspan="6" class="px-6 py-4 text-sm text-center text-gray-500">
-                                            No hay facturas emitidas
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <DataTable
+                    :rows="facturas"
+                    :columns="columns"
+                    :filters="filters"
+                    route-name="club.facturas.index"
+                >
+                    <template #cell-numero="{ row }">
+                        <span class="font-medium text-gray-900">{{ row.numero || 'BORRADOR' }}</span>
+                    </template>
 
-                        <!-- Paginación -->
-                        <div v-if="facturas.links" class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-700">
-                                Mostrando {{ facturas.from }} a {{ facturas.to }} de {{ facturas.total }} resultados
+                    <template #cell-receptor="{ row }">
+                        <div class="flex items-center">
+                            <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs mr-3">
+                                {{ (row.receptor?.nombre || row.receptor?.nombre_legal || '?').substring(0, 2).toUpperCase() }}
                             </div>
-                            <div class="flex gap-1">
-                                <component v-for="link in facturas.links" :key="link.label" :is="link.url ? Link : 'span'" :href="link.url" :class="link.active ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'" class="px-3 py-2 text-sm border rounded" v-html="link.label"></component>
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-900">{{ row.receptor?.nombre || row.receptor?.nombre_legal }}</div>
+                                <div class="text-gray-500 text-xs">{{ row.receptor?.email }}</div>
                             </div>
                         </div>
-                    </div>
-                </Card>
+                    </template>
+
+                    <template #cell-fecha_factura="{ value }">
+                        {{ new Date(value).toLocaleDateString('es-ES') }}
+                    </template>
+
+                    <template #cell-total="{ value }">
+                        <span class="font-bold text-gray-900">{{ formatCurrency(value) }}</span>
+                    </template>
+
+                    <template #cell-estado="{ value }">
+                        <Badge :color="getEstadoColor(value)">
+                            {{ getEstadoLabel(value) }}
+                        </Badge>
+                    </template>
+
+                    <template #cell-actions="{ row }">
+                        <Link :href="route('club.facturas.show', row.id)" class="text-primary-600 hover:text-primary-900 font-medium text-sm transition-colors duration-200">
+                            Ver Detalles
+                        </Link>
+                    </template>
+
+                    <template #pagination="{ links }">
+                        <Pagination :links="links" />
+                    </template>
+                </DataTable>
             </div>
         </div>
     </AuthenticatedLayout>

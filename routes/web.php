@@ -50,7 +50,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('clubes', App\Http\Controllers\Admin\ClubController::class);
     
     // Gestión de proveedores
-    Route::resource('proveedores', App\Http\Controllers\Admin\ProveedorController::class);
+    Route::resource('proveedores', App\Http\Controllers\Admin\ProveedorController::class)
+        ->parameters(['proveedores' => 'proveedor']);
 });
 
 // Ruta para salir del modo impersonación (disponible para cualquier usuario autenticado)

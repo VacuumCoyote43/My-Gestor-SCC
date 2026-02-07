@@ -39,7 +39,7 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                <h2 class="text-xl font-semibold leading-tight text-white">
                     Registrar Pago
                 </h2>
                 <Link :href="route('jugador.cargos.show', cargo.id)" class="text-blue-600 hover:text-blue-900">

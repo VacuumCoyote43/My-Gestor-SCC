@@ -25,7 +25,7 @@ const submit = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">
+            <h2 class="text-xl font-semibold leading-tight">
                 Nuevo Proveedor
             </h2>
         </template>
@@ -83,9 +83,10 @@ const submit = () => {
                                 <InputError class="mt-2" :message="form.errors.direccion" />
                             </div>
 
-                            <div class="flex items-center">
+                            <div class="flex items-center gap-2">
                                 <Checkbox id="es_liga" v-model:checked="form.es_liga" />
-                                <InputLabel for="es_liga" value="Es la Liga" class="ml-2" />
+                                <InputLabel for="es_liga" value="Es la Liga" class="cursor-pointer" />
+                                <InputError class="mt-2" :message="form.errors.es_liga" />
                             </div>
 
                             <div class="flex items-center gap-4">

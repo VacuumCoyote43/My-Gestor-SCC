@@ -65,7 +65,7 @@ const submit = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                <h2 class="text-xl font-semibold leading-tight text-white">
                     Nueva Factura{{ club ? ' - ' + club.nombre : '' }}
                 </h2>
                 <Link :href="route('club.facturas.index')" class="text-blue-600 hover:text-blue-900">

@@ -13,7 +13,7 @@ defineProps({
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-gray-800">
+                <h2 class="text-xl font-semibold leading-tight text-white">
                     Detalle de Usuario
                 </h2>
                 <Link :href="route('admin.users.index')" class="text-blue-600 hover:text-blue-900">
