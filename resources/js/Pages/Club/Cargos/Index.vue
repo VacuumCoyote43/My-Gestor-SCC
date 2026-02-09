@@ -1,7 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SearchFilter from '@/Components/SearchFilter.vue';
-import Card from '@/Components/Card.vue';
+import DataTable from '@/Components/DataTable.vue';
+import Pagination from '@/Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -12,6 +13,16 @@ const props = defineProps({
 
 const estadoFilter = ref(props.filters.estado || '');
 const mesFilter = ref(props.filters.mes || '');
+
+const columns = [
+    { key: 'id', label: 'ID', sortable: true },
+    { key: 'club', label: 'Club', sortable: false },
+    { key: 'jugador', label: 'Jugador', sortable: false },
+    { key: 'fecha_emision', label: 'Fecha Emisión', sortable: true },
+    { key: 'total', label: 'Total', sortable: true, class: 'text-right', rowClass: 'text-right font-medium' },
+    { key: 'estado', label: 'Estado', sortable: true },
+    { key: 'actions', label: 'Acciones', sortable: false, class: 'text-right', rowClass: 'text-right' },
+];
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('es-ES', {
@@ -59,8 +70,8 @@ const applyFilters = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Cargos a Jugadores
                 </h2>
                 <Link :href="route('club.cargos.create')" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/50 transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl hover:shadow-primary-500/50 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-95">
@@ -124,69 +135,36 @@ const applyFilters = () => {
                     </template>
                 </SearchFilter>
 
-                <Card :padding="false">
-                    <div class="p-6">
-                        <!-- Filtros -->
-                        <div class="mb-4">
-                            <!-- TODO: Agregar filtros por estado -->
-                        </div>
-
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Club</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Jugador</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha Emisión</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Total</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="cargo in cargos.data" :key="cargo.id">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            #{{ cargo.id }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ cargo.club?.nombre }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ cargo.jugador?.name }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ new Date(cargo.fecha_emision).toLocaleDateString('es-ES') }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right text-gray-900 whitespace-nowrap">
-                                            {{ formatCurrency(cargo.total) }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="getEstadoBadgeClass(cargo.estado)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                                {{ getEstadoLabel(cargo.estado) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
-                                            <Link :href="route('club.cargos.show', cargo.id)" class="text-blue-600 hover:text-blue-900">
-                                                Ver
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Paginación -->
-                        <div v-if="cargos.links" class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-700">
-                                Mostrando {{ cargos.from }} a {{ cargos.to }} de {{ cargos.total }} resultados
-                            </div>
-                            <div class="flex gap-1">
-                                <component v-for="link in cargos.links" :key="link.label" :is="link.url ? Link : 'span'" :href="link.url" :class="link.active ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'" class="px-3 py-2 text-sm border rounded" v-html="link.label"></component>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
+                <DataTable :rows="cargos" :columns="columns" :filters="filters" route-name="club.cargos.index" :sticky-header="true">
+                    <template #cell-id="{ row }">
+                        <span class="font-semibold text-gray-900">#{{ row.id }}</span>
+                    </template>
+                    <template #cell-club="{ row }">
+                        <span class="text-gray-600">{{ row.club?.nombre }}</span>
+                    </template>
+                    <template #cell-jugador="{ row }">
+                        <span class="text-gray-600">{{ row.jugador?.name }}</span>
+                    </template>
+                    <template #cell-fecha_emision="{ value }">
+                        {{ new Date(value).toLocaleDateString('es-ES') }}
+                    </template>
+                    <template #cell-total="{ value }">
+                        <span class="font-semibold text-gray-900">{{ formatCurrency(value) }}</span>
+                    </template>
+                    <template #cell-estado="{ row }">
+                        <span :class="getEstadoBadgeClass(row.estado)" class="inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                            {{ getEstadoLabel(row.estado) }}
+                        </span>
+                    </template>
+                    <template #cell-actions="{ row }">
+                        <Link :href="route('club.cargos.show', row.id)" class="text-sm font-medium text-blue-600 transition hover:text-blue-900">
+                            Ver
+                        </Link>
+                    </template>
+                    <template #pagination="{ links }">
+                        <Pagination :links="links" />
+                    </template>
+                </DataTable>
             </div>
         </div>
     </AuthenticatedLayout>

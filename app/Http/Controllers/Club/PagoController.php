@@ -32,8 +32,12 @@ class PagoController extends Controller
     {
         $this->authorize('view', $factura);
 
+        $totalPagadoRegistrado = $factura->pagos()
+            ->whereIn('estado_pago', [Pago::ESTADO_REGISTRADO, Pago::ESTADO_VALIDADO])
+            ->sum('importe');
+
         return Inertia::render('Club/Pagos/Create', [
-            'factura' => $factura->load('conceptos'),
+            'factura' => $factura->load('conceptos')->setAttribute('total_pagado_registrado', $totalPagadoRegistrado),
         ]);
     }
 

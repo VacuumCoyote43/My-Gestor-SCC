@@ -6,6 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import Card from '@/Components/Card.vue';
 
 const props = defineProps({
     clubes: Array,
@@ -42,14 +43,14 @@ const submit = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-white">
+            <h2 class="text-xl font-semibold leading-tight text-gray-900">
                 Nuevo Cargo a Jugador
             </h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <form @submit.prevent="submit" class="space-y-6">
                             <!-- Datos básicos -->
@@ -59,7 +60,7 @@ const submit = () => {
                                     <select
                                         id="club_id"
                                         v-model="form.club_id"
-                                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                         required
                                     >
                                         <option :value="null">Seleccione un club...</option>
@@ -75,7 +76,7 @@ const submit = () => {
                                     <select
                                         id="user_id_jugador"
                                         v-model="form.user_id_jugador"
-                                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                         required
                                     >
                                         <option :value="null">Seleccione un jugador...</option>
@@ -121,7 +122,7 @@ const submit = () => {
                                     </SecondaryButton>
                                 </div>
 
-                                <div v-for="(concepto, index) in form.conceptos" :key="index" class="p-4 mb-4 border border-gray-200 rounded-lg">
+                                <div v-for="(concepto, index) in form.conceptos" :key="index" class="mb-4 rounded-xl border border-gray-200 bg-gray-50/60 p-4">
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <div>
                                             <InputLabel :for="`descripcion_${index}`" value="Descripción *" />
@@ -153,7 +154,7 @@ const submit = () => {
                                             v-if="form.conceptos.length > 1"
                                             type="button"
                                             @click="eliminarConcepto(index)"
-                                            class="text-sm text-red-600 hover:text-red-900"
+                                            class="text-sm font-medium text-red-600 hover:text-red-900"
                                         >
                                             Eliminar concepto
                                         </button>
@@ -164,14 +165,14 @@ const submit = () => {
                             </div>
 
                             <!-- Botones -->
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-4 border-t border-gray-100 pt-4">
                                 <PrimaryButton :disabled="form.processing">
                                     Crear Cargo (Borrador)
                                 </PrimaryButton>
                             </div>
                         </form>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

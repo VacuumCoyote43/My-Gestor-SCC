@@ -30,8 +30,12 @@ class PagoController extends Controller
     {
         $this->authorize('view', $cargo);
 
+        $totalPagadoRegistrado = $cargo->pagos()
+            ->whereIn('estado_pago', [Pago::ESTADO_REGISTRADO, Pago::ESTADO_VALIDADO])
+            ->sum('importe');
+
         return Inertia::render('Jugador/Pagos/Create', [
-            'cargo' => $cargo->load('conceptos'),
+            'cargo' => $cargo->load('conceptos')->setAttribute('total_pagado_registrado', $totalPagadoRegistrado),
         ]);
     }
 

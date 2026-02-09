@@ -1,7 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SearchFilter from '@/Components/SearchFilter.vue';
-import Card from '@/Components/Card.vue';
+import DataTable from '@/Components/DataTable.vue';
+import Pagination from '@/Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -12,6 +13,14 @@ const props = defineProps({
 
 const roleFilter = ref(props.filters.role || '');
 const activeFilter = ref(props.filters.active || '');
+
+const columns = [
+    { key: 'name', label: 'Nombre', sortable: true },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'role', label: 'Rol', sortable: false },
+    { key: 'active', label: 'Estado', sortable: false },
+    { key: 'actions', label: 'Acciones', sortable: false, class: 'text-right', rowClass: 'text-right' },
+];
 
 const loginAs = (userId) => {
     if (confirm('¿Estás seguro de que quieres iniciar sesión como este usuario?')) {
@@ -36,7 +45,7 @@ const applyFilters = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-4">
                 <h2 class="text-xl font-semibold leading-tight">
                     Gestión de Usuarios
                 </h2>
@@ -90,64 +99,38 @@ const applyFilters = () => {
                     </template>
                 </SearchFilter>
 
-                <Card :padding="false">
-                    <div class="p-6">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Rol</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="user in users.data" :key="user.id">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            {{ user.name }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ user.email }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            <span v-if="user.role" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                {{ user.role.nombre }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                                {{ user.active ? 'Activo' : 'Inactivo' }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
-                                            <button @click="loginAs(user.id)" class="text-purple-600 hover:text-purple-900 mr-3" title="Iniciar sesión como este usuario">
-                                                🔐 Login
-                                            </button>
-                                            <Link :href="route('admin.users.edit', user.id)" class="text-blue-600 hover:text-blue-900 mr-3">
-                                                Editar
-                                            </Link>
-                                            <Link :href="route('admin.users.show', user.id)" class="text-green-600 hover:text-green-900">
-                                                Ver
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Paginación -->
-                        <div v-if="users.links" class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-700">
-                                Mostrando {{ users.from }} a {{ users.to }} de {{ users.total }} resultados
-                            </div>
-                            <div class="flex gap-1">
-                                <component v-for="link in users.links" :key="link.label" :is="link.url ? Link : 'span'" :href="link.url" :class="link.active ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'" class="px-3 py-2 text-sm border rounded" v-html="link.label"></component>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
+                <DataTable :rows="users" :columns="columns" :filters="filters" route-name="admin.users.index">
+                    <template #cell-name="{ row }">
+                        <span class="font-semibold text-gray-900">{{ row.name }}</span>
+                    </template>
+                    <template #cell-email="{ row }">
+                        <span class="text-gray-500">{{ row.email }}</span>
+                    </template>
+                    <template #cell-role="{ row }">
+                        <span v-if="row.role" class="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
+                            {{ row.role.nombre }}
+                        </span>
+                    </template>
+                    <template #cell-active="{ row }">
+                        <span :class="row.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                            {{ row.active ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </template>
+                    <template #cell-actions="{ row }">
+                        <button @click="loginAs(row.id)" class="mr-3 text-sm font-medium text-purple-600 transition hover:text-purple-900" title="Iniciar sesión como este usuario">
+                            🔐 Login
+                        </button>
+                        <Link :href="route('admin.users.edit', row.id)" class="mr-3 text-sm font-medium text-blue-600 transition hover:text-blue-900">
+                            Editar
+                        </Link>
+                        <Link :href="route('admin.users.show', row.id)" class="text-sm font-medium text-green-600 transition hover:text-green-900">
+                            Ver
+                        </Link>
+                    </template>
+                    <template #pagination="{ links }">
+                        <Pagination :links="links" />
+                    </template>
+                </DataTable>
             </div>
         </div>
     </AuthenticatedLayout>

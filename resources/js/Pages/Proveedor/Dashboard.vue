@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import Card from '@/Components/Card.vue';
 
 defineProps({
     proveedor: Object,
@@ -20,63 +21,63 @@ const formatCurrency = (value) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-white">
+            <h2 class="text-xl font-semibold leading-tight text-gray-900">
                 Dashboard Proveedor
             </h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div v-if="proveedor" class="mb-6">
-                    <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                    <Card>
                         <div class="p-6">
                             <h3 class="text-lg font-semibold text-gray-900">{{ proveedor.nombre_legal }}</h3>
                             <p class="text-sm text-gray-600">NIF/CIF: {{ proveedor.nif_cif }}</p>
                         </div>
-                    </div>
+                    </Card>
                 </div>
 
                 <div v-if="balance" class="mb-6">
-                    <h3 class="mb-4 text-lg font-semibold text-gray-900">
+                    <h3 class="mb-4 text-lg font-semibold text-white">
                         Balance Mensual - {{ balance.periodo.mes_nombre }} {{ balance.periodo.year }}
                     </h3>
                     
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
-                        <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <Card>
                             <div class="p-6">
                                 <div class="text-sm font-medium text-gray-500">Total Emitido</div>
                                 <div class="mt-2 text-2xl font-bold text-blue-600">
                                     {{ formatCurrency(balance.total_emitido) }}
                                 </div>
                             </div>
-                        </div>
+                        </Card>
 
-                        <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <Card>
                             <div class="p-6">
                                 <div class="text-sm font-medium text-gray-500">Total Cobrado</div>
                                 <div class="mt-2 text-2xl font-bold text-green-600">
                                     {{ formatCurrency(balance.total_cobrado) }}
                                 </div>
                             </div>
-                        </div>
+                        </Card>
 
-                        <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <Card>
                             <div class="p-6">
                                 <div class="text-sm font-medium text-gray-500">Pendiente Cobro</div>
                                 <div class="mt-2 text-2xl font-bold text-yellow-600">
                                     {{ formatCurrency(balance.pendiente_cobro) }}
                                 </div>
                             </div>
-                        </div>
+                        </Card>
 
-                        <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <Card>
                             <div class="p-6">
                                 <div class="text-sm font-medium text-gray-500">Balance</div>
                                 <div class="mt-2 text-2xl font-bold" :class="balance.balance >= 0 ? 'text-green-600' : 'text-red-600'">
                                     {{ formatCurrency(balance.balance) }}
                                 </div>
                             </div>
-                        </div>
+                        </Card>
                     </div>
                 </div>
 

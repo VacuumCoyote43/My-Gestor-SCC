@@ -8,12 +8,21 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import FlashMessages from '@/Components/FlashMessages.vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 
-const showingNavigationDropdown = ref(false);
+const showingSidebar = ref(false);
 const page = usePage();
 
 const isImpersonating = computed(() => {
     return page.props.auth?.is_impersonating || false;
 });
+
+const showBackButton = computed(() => {
+    const component = page.component || '';
+    return !component.endsWith('/Index') && !component.endsWith('Dashboard');
+});
+
+const goBack = () => {
+    window.history.back();
+};
 
 const userRole = computed(() => {
     return page.props.auth?.user?.role?.nombre || '';
@@ -30,267 +39,264 @@ const stopImpersonating = () => {
         
         <div class="min-h-screen bg-gray-50">
             <!-- Banner de impersonación -->
-            <div v-if="isImpersonating" class="bg-yellow-500 text-white px-4 py-2 text-center">
-                <span class="font-semibold">Estás viendo la aplicación como otro usuario.</span>
-                <button @click="stopImpersonating" class="ml-4 underline hover:no-underline">
-                    Volver a mi cuenta de administrador
-                </button>
-            </div>
+            <div class="flex min-h-screen">
+                <!-- Mobile Sidebar Overlay -->
+                <div v-if="showingSidebar" class="fixed inset-0 z-40 bg-black/40 lg:hidden" @click="showingSidebar = false"></div>
 
-            <nav
-                class="bg-gradient-to-r from-primary-600 to-primary-700 shadow-sm border-b border-primary-700/50"
-            >
-                <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="flex h-16 justify-between">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-white"
-                                    />
-                                </Link>
+                <!-- Mobile Sidebar -->
+                <aside
+                    v-if="showingSidebar"
+                    class="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl lg:hidden"
+                >
+                    <div class="flex h-16 items-center border-b border-gray-200 px-6">
+                        <Link :href="route('dashboard')" class="flex items-center gap-3">
+                            <ApplicationLogo class="h-9 w-auto fill-current text-primary-600" />
+                            <span class="text-sm font-semibold text-gray-900">Panel</span>
+                        </Link>
+                    </div>
+                    <nav class="flex flex-col px-4 py-6" style="height: calc(100vh - 64px);">
+                        <div class="space-y-6">
+                            <div>
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">General</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                        Dashboard
+                                    </NavLink>
+                                    <NavLink :href="route('incidencias.index')" :active="route().current('incidencias.*')">
+                                        Incidencias
+                                    </NavLink>
+                                </div>
                             </div>
 
-                            <!-- Navigation Links -->
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Dashboard
-                                </NavLink>
-
-                                <!-- Enlaces Admin -->
-                                <template v-if="userRole === 'admin'">
-                                    <NavLink
-                                        :href="route('admin.users.index')"
-                                        :active="route().current('admin.users.*')"
-                                    >
+                            <div v-if="userRole === 'admin'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Administración</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('admin.users.index')" :active="route().current('admin.users.*')">
                                         Usuarios
                                     </NavLink>
-                                    <NavLink
-                                        :href="route('admin.clubes.index')"
-                                        :active="route().current('admin.clubes.*')"
-                                    >
+                                    <NavLink :href="route('admin.clubes.index')" :active="route().current('admin.clubes.*')">
                                         Clubes
                                     </NavLink>
-                                    <NavLink
-                                        :href="route('admin.proveedores.index')"
-                                        :active="route().current('admin.proveedores.*')"
-                                    >
+                                    <NavLink :href="route('admin.proveedores.index')" :active="route().current('admin.proveedores.*')">
                                         Proveedores
                                     </NavLink>
-                                </template>
+                                </div>
+                            </div>
 
-                                <!-- Enlaces Proveedor -->
-                                <template v-if="userRole === 'proveedor'">
-                                    <NavLink
-                                        :href="route('proveedor.facturas.index')"
-                                        :active="route().current('proveedor.facturas.*')"
-                                    >
+                            <div v-if="userRole === 'proveedor'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Proveedor</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('proveedor.facturas.index')" :active="route().current('proveedor.facturas.*')">
                                         Facturas
                                     </NavLink>
-                                </template>
+                                </div>
+                            </div>
 
-                                <!-- Enlaces Gestor Club -->
-                                <template v-if="userRole === 'gestor_club'">
-                                    <NavLink
-                                        :href="route('club.facturas.index')"
-                                        :active="route().current('club.facturas.*')"
-                                    >
+                            <div v-if="userRole === 'gestor_club'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Gestión Club</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('club.facturas.index')" :active="route().current('club.facturas.*')">
                                         Facturas Emitidas
                                     </NavLink>
-                                    <NavLink
-                                        :href="route('club.facturas-recibidas.index')"
-                                        :active="route().current('club.facturas-recibidas.*')"
-                                    >
+                                    <NavLink :href="route('club.facturas-recibidas.index')" :active="route().current('club.facturas-recibidas.*')">
                                         Facturas Recibidas
                                     </NavLink>
-                                    <NavLink
-                                        :href="route('club.cargos.index')"
-                                        :active="route().current('club.cargos.*')"
-                                    >
+                                    <NavLink :href="route('club.cargos.index')" :active="route().current('club.cargos.*')">
                                         Cargos Jugadores
                                     </NavLink>
-                                </template>
+                                </div>
+                            </div>
 
-                                <!-- Enlaces Jugador -->
-                                <template v-if="userRole === 'jugador'">
-                                    <NavLink
-                                        :href="route('jugador.cargos.index')"
-                                        :active="route().current('jugador.cargos.*')"
-                                    >
+                            <div v-if="userRole === 'jugador'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Jugador</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('jugador.cargos.index')" :active="route().current('jugador.cargos.*')">
                                         Mis Cargos
                                     </NavLink>
-                                </template>
-
-                                <!-- Incidencias (todos los roles) -->
-                                <NavLink
-                                    :href="route('incidencias.index')"
-                                    :active="route().current('incidencias.*')"
-                                >
-                                    Incidencias
-                                </NavLink>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Settings Dropdown -->
-                            <div class="relative ms-3">
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <span class="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center rounded-md border border-transparent bg-white/10 px-3 py-2 text-sm font-medium leading-4 text-white transition duration-150 ease-in-out hover:bg-white/20 hover:text-white focus:outline-none"
-                                            >
-                                                {{ $page.props.auth.user.name }}
-
-                                                <svg
-                                                    class="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </template>
-
-                                    <template #content>
-                                        <DropdownLink
-                                            :href="route('profile.edit')"
-                                        >
-                                            Profile
-                                        </DropdownLink>
-                                        <DropdownLink
-                                            :href="route('logout')"
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </DropdownLink>
-                                    </template>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-white/80 transition duration-150 ease-in-out hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white focus:outline-none"
-                            >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
-                >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div
-                        class="border-t border-white/10 pb-1 pt-4"
-                    >
-                        <div class="px-4">
-                            <div
-                                class="text-base font-medium text-white"
-                            >
+                        <div class="mt-auto border-t border-gray-200 pt-4">
+                            <div class="px-2 text-sm font-medium text-gray-900">
                                 {{ $page.props.auth.user.name }}
                             </div>
-                            <div class="text-sm font-medium text-white/70">
+                            <div class="px-2 text-xs text-gray-500">
                                 {{ $page.props.auth.user.email }}
+                            </div>
+                            <div class="mt-3 space-y-1">
+                                <ResponsiveNavLink :href="route('profile.edit')">
+                                    Perfil
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    :href="route('logout')"
+                                    method="post"
+                                    as="button"
+                                >
+                                    Cerrar sesión
+                                </ResponsiveNavLink>
+                            </div>
+                        </div>
+                    </nav>
+                </aside>
+
+                <!-- Desktop Sidebar -->
+                <aside class="hidden w-72 flex-col border-r border-gray-200 bg-white lg:flex">
+                    <div class="flex h-16 items-center border-b border-gray-200 px-6">
+                        <Link :href="route('dashboard')" class="flex items-center gap-3">
+                            <ApplicationLogo class="h-9 w-auto fill-current text-primary-600" />
+                            <span class="text-sm font-semibold text-gray-900">Panel</span>
+                        </Link>
+                    </div>
+                    <nav class="flex h-full flex-col px-4 py-6">
+                        <div class="space-y-6">
+                            <div>
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">General</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                        Dashboard
+                                    </NavLink>
+                                    <NavLink :href="route('incidencias.index')" :active="route().current('incidencias.*')">
+                                        Incidencias
+                                    </NavLink>
+                                </div>
+                            </div>
+
+                            <div v-if="userRole === 'admin'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Administración</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('admin.users.index')" :active="route().current('admin.users.*')">
+                                        Usuarios
+                                    </NavLink>
+                                    <NavLink :href="route('admin.clubes.index')" :active="route().current('admin.clubes.*')">
+                                        Clubes
+                                    </NavLink>
+                                    <NavLink :href="route('admin.proveedores.index')" :active="route().current('admin.proveedores.*')">
+                                        Proveedores
+                                    </NavLink>
+                                </div>
+                            </div>
+
+                            <div v-if="userRole === 'proveedor'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Proveedor</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('proveedor.facturas.index')" :active="route().current('proveedor.facturas.*')">
+                                        Facturas
+                                    </NavLink>
+                                </div>
+                            </div>
+
+                            <div v-if="userRole === 'gestor_club'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Gestión Club</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('club.facturas.index')" :active="route().current('club.facturas.*')">
+                                        Facturas Emitidas
+                                    </NavLink>
+                                    <NavLink :href="route('club.facturas-recibidas.index')" :active="route().current('club.facturas-recibidas.*')">
+                                        Facturas Recibidas
+                                    </NavLink>
+                                    <NavLink :href="route('club.cargos.index')" :active="route().current('club.cargos.*')">
+                                        Cargos Jugadores
+                                    </NavLink>
+                                </div>
+                            </div>
+
+                            <div v-if="userRole === 'jugador'">
+                                <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Jugador</p>
+                                <div class="space-y-1">
+                                    <NavLink :href="route('jugador.cargos.index')" :active="route().current('jugador.cargos.*')">
+                                        Mis Cargos
+                                    </NavLink>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
+                        <div class="mt-auto border-t border-gray-200 pt-4">
+                            <div class="px-2 text-sm font-medium text-gray-900">
+                                {{ $page.props.auth.user.name }}
+                            </div>
+                            <div class="px-2 text-xs text-gray-500">
+                                {{ $page.props.auth.user.email }}
+                            </div>
+                            <div class="mt-3 space-y-1">
+                                <ResponsiveNavLink :href="route('profile.edit')">
+                                    Perfil
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    :href="route('logout')"
+                                    method="post"
+                                    as="button"
+                                >
+                                    Cerrar sesión
+                                </ResponsiveNavLink>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </nav>
+                    </nav>
+                </aside>
 
-            <!-- Page Heading -->
-            <header
-                class="bg-gradient-to-r from-primary-600 to-primary-700 shadow-lg"
-                v-if="$slots.header"
-            >
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <div class="text-white">
-                        <slot name="header" />
-                    </div>
-                </div>
-            </header>
+                <div class="flex min-w-0 flex-1 flex-col">
+                    <header class="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur lg:hidden">
+                        <div class="flex h-16 items-center justify-between px-4 sm:px-6">
+                            <div class="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 text-gray-600 shadow-sm transition hover:bg-gray-50 hover:text-gray-900"
+                                    @click="showingSidebar = true"
+                                >
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-widest text-gray-400">Panel</p>
+                                    <p class="text-sm font-semibold text-gray-900">Gestor SCC</p>
+                                </div>
+                            </div>
+                            <div v-if="showBackButton" class="ml-auto">
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-gray-900"
+                                    @click="goBack"
+                                >
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                    Volver
+                                </button>
+                            </div>
+                        </div>
+                    </header>
 
-            <!-- Page Content -->
-            <main class="bg-gray-50">
-                <slot />
-            </main>
+                    <header v-if="$slots.header" class="border-b border-gray-200 bg-white">
+                        <div class="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-between">
+                            <slot name="header" />
+                            <!-- Solo mostrar si es vista desktop -->
+                            <div v-if="showBackButton && !showingSidebar" class="ml-auto">
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-gray-900"
+                                    @click="goBack"
+                                >
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                    Volver
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+                    <div v-if="isImpersonating" class="bg-yellow-500 text-white px-4 py-2 text-center">
+                        <span class="font-semibold">Estás viendo la aplicación como otro usuario.</span>
+                        <button @click="stopImpersonating" class="ml-4 underline hover:no-underline">
+                            Volver a mi cuenta de administrador
+                        </button>
+                    </div>
+
+                    <main class="flex-1 bg-gray-50 p-4 sm:p-6 bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700">
+                        <slot />
+                    </main>
+                </div>
+            </div>
         </div>
     </div>
 </template>

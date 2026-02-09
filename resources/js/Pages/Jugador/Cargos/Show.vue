@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Card from '@/Components/Card.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -35,8 +36,8 @@ const puedeRegistrarPago = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Mi Cargo #{{ cargo.id }}
                 </h2>
                 <Link v-if="puedeRegistrarPago()" :href="route('jugador.cargos.pagos.create', cargo.id)" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-green-600 to-green-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-green-500/50 transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:shadow-xl hover:shadow-green-500/50 focus:outline-none focus:ring-4 focus:ring-green-300 active:scale-95">
@@ -48,10 +49,10 @@ const puedeRegistrarPago = () => {
             </div>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
                 <!-- Información básica -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
@@ -81,10 +82,10 @@ const puedeRegistrarPago = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Conceptos -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Conceptos</h3>
                         <div class="overflow-x-auto">
@@ -108,14 +109,14 @@ const puedeRegistrarPago = () => {
                             </table>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Pagos realizados -->
-                <div v-if="cargo.pagos && cargo.pagos.length > 0" class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card v-if="cargo.pagos && cargo.pagos.length > 0">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Mis Pagos</h3>
                         <div class="space-y-4">
-                            <div v-for="pago in cargo.pagos" :key="pago.id" class="p-4 border border-gray-200 rounded-lg">
+                            <div v-for="pago in cargo.pagos" :key="pago.id" class="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <div>
                                         <span class="text-sm font-medium text-gray-900">{{ formatCurrency(pago.importe) }}</span>
@@ -129,7 +130,7 @@ const puedeRegistrarPago = () => {
                                 <div v-if="pago.archivo_adjuntos && pago.archivo_adjuntos.length > 0" class="mt-2">
                                     <p class="text-xs text-gray-500 mb-1">Justificantes:</p>
                                     <div class="flex flex-wrap gap-2">
-                                        <a v-for="archivo in pago.archivo_adjuntos" :key="archivo.id" :href="route('archivos.download', archivo.id)" class="text-xs text-blue-600 hover:text-blue-900">
+                                        <a v-for="archivo in pago.archivo_adjuntos" :key="archivo.id" :href="route('archivos.download', archivo.id)" class="text-xs font-medium text-primary-600 hover:text-primary-800">
                                             📎 {{ archivo.nombre_original }}
                                         </a>
                                     </div>
@@ -137,17 +138,17 @@ const puedeRegistrarPago = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Mensaje si no hay pagos -->
-                <div v-else class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card v-else>
                     <div class="p-6 text-center text-gray-500">
                         No has registrado ningún pago aún.
-                        <Link v-if="puedeRegistrarPago()" :href="route('jugador.cargos.pagos.create', cargo.id)" class="block mt-4 text-blue-600 hover:text-blue-900">
+                        <Link v-if="puedeRegistrarPago()" :href="route('jugador.cargos.pagos.create', cargo.id)" class="mt-4 inline-flex text-sm font-medium text-primary-600 hover:text-primary-800">
                             Registrar tu primer pago
                         </Link>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

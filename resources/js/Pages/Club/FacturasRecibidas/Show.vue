@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import Card from '@/Components/Card.vue';
 
 const props = defineProps({
     factura: Object,
@@ -34,8 +35,8 @@ const puedeRegistrarPago = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Factura {{ factura.numero }}
                 </h2>
                 <Link v-if="puedeRegistrarPago()" :href="route('club.facturas.pagos.create', factura.id)" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-green-600 to-green-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-green-500/50 transition-all duration-200 hover:from-green-700 hover:to-green-800 hover:shadow-xl hover:shadow-green-500/50 focus:outline-none focus:ring-4 focus:ring-green-300 active:scale-95">
@@ -47,10 +48,10 @@ const puedeRegistrarPago = () => {
             </div>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
                 <!-- Información básica -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
@@ -98,10 +99,10 @@ const puedeRegistrarPago = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Conceptos -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Conceptos</h3>
                         <div class="overflow-x-auto">
@@ -125,14 +126,14 @@ const puedeRegistrarPago = () => {
                             </table>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Documentos Adjuntos -->
-                <div v-if="factura.archivo_adjuntos?.length > 0" class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card v-if="factura.archivo_adjuntos?.length > 0">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Documentos Adjuntos</h3>
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            <div v-for="archivo in factura.archivo_adjuntos" :key="archivo.id" class="p-4 border border-gray-200 rounded-lg hover:border-blue-500 transition">
+                            <div v-for="archivo in factura.archivo_adjuntos" :key="archivo.id" class="rounded-xl border border-gray-200 bg-gray-50/60 p-4 transition hover:border-primary-300">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 truncate" :title="archivo.nombre_original">
@@ -144,24 +145,24 @@ const puedeRegistrarPago = () => {
                                     </div>
                                 </div>
                                 <div class="flex gap-2 mt-3">
-                                    <a :href="route('archivos.view', archivo.id)" target="_blank" class="text-xs text-blue-600 hover:text-blue-800">
+                                    <a :href="route('archivos.view', archivo.id)" target="_blank" class="text-xs font-medium text-primary-600 hover:text-primary-800">
                                         Ver
                                     </a>
-                                    <a :href="route('archivos.download', archivo.id)" class="text-xs text-green-600 hover:text-green-800">
+                                    <a :href="route('archivos.download', archivo.id)" class="text-xs font-medium text-emerald-600 hover:text-emerald-800">
                                         Descargar
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Pagos -->
-                <div v-if="factura.pagos && factura.pagos.length > 0" class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card v-if="factura.pagos && factura.pagos.length > 0">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Pagos Registrados</h3>
                         <div class="space-y-4">
-                            <div v-for="pago in factura.pagos" :key="pago.id" class="p-4 border border-gray-200 rounded-lg">
+                            <div v-for="pago in factura.pagos" :key="pago.id" class="rounded-xl border border-gray-200 bg-gray-50/60 p-4">
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <span class="text-sm font-medium text-gray-900">{{ formatCurrency(pago.importe) }}</span>
@@ -175,7 +176,7 @@ const puedeRegistrarPago = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

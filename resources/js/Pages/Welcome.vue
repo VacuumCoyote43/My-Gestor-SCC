@@ -9,6 +9,10 @@ defineProps({
         type: Boolean,
     },
 });
+
+const goBack = () => {
+    window.history.back();
+};
 </script>
 
 <template>
@@ -18,8 +22,8 @@ defineProps({
         <!-- Navegación -->
         <nav class="relative z-10">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-20 items-center justify-between">
-                    <div class="flex items-center">
+                <div class="flex h-20 items-center justify-between flex-col sm:flex-row sm:space-x-5 space-y-5">
+                    <div class="flex items-center sm:mt-0 mt-5">
                         <div class="flex items-center space-x-3">
                             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm">
                                 <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +37,7 @@ defineProps({
                         </div>
                     </div>
                     
-                    <div v-if="canLogin" class="flex items-center space-x-4">
+                    <div v-if="canLogin" class="flex items-center space-x-4 sm:space-x-4">
                         <Link
                             :href="route('login')"
                             class="rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-white/10 backdrop-blur-sm"

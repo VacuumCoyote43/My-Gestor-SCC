@@ -6,6 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import Card from '@/Components/Card.vue';
 
 const props = defineProps({
     incidencia: Object,
@@ -70,15 +71,15 @@ const cambiarEstado = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight">
+            <h2 class="text-xl font-semibold leading-tight text-gray-900">
                 Incidencia: {{ incidencia.asunto }}
             </h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
                 <!-- Información de la incidencia -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
@@ -119,7 +120,7 @@ const cambiarEstado = () => {
                                         <select
                                             id="estado"
                                             v-model="estadoForm.estado"
-                                            class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            class="block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                         >
                                             <option value="abierta">Abierta</option>
                                             <option value="en_progreso">En Progreso</option>
@@ -147,10 +148,10 @@ const cambiarEstado = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Chat de mensajes -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Conversación</h3>
                         
@@ -192,7 +193,7 @@ const cambiarEstado = () => {
                                     id="mensaje"
                                     v-model="mensajeForm.mensaje"
                                     rows="4"
-                                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                     placeholder="Escribe tu mensaje aquí..."
                                     required
                                 ></textarea>
@@ -204,7 +205,7 @@ const cambiarEstado = () => {
                                 <select
                                     id="tipo"
                                     v-model="mensajeForm.tipo"
-                                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                 >
                                     <option value="publico">Público (visible para el creador)</option>
                                     <option value="interno">Interno (solo admins)</option>
@@ -219,19 +220,19 @@ const cambiarEstado = () => {
                                     type="file"
                                     multiple
                                     @change="handleFileChange"
-                                    class="block w-full mt-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100"
                                 />
                                 <InputError class="mt-2" :message="mensajeForm.errors.archivos" />
                             </div>
 
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-4 border-t border-gray-100 pt-4">
                                 <PrimaryButton :disabled="mensajeForm.processing">
                                     Enviar Mensaje
                                 </PrimaryButton>
                             </div>
                         </form>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

@@ -5,6 +5,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Card from '@/Components/Card.vue';
 
 const props = defineProps({
     user: Object,
@@ -28,19 +29,16 @@ const submit = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Editar Usuario
                 </h2>
-                <Link :href="route('admin.users.index')" class="text-blue-600 hover:text-blue-900">
-                    Volver al listado
-                </Link>
             </div>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <form @submit.prevent="submit">
                             <div class="mb-4">
@@ -72,7 +70,7 @@ const submit = () => {
                                 <select
                                     id="role_id"
                                     v-model="form.role_id"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                     required
                                 >
                                     <option value="">Selecciona un rol</option>
@@ -88,15 +86,15 @@ const submit = () => {
                                     <input
                                         type="checkbox"
                                         v-model="form.active"
-                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                        class="rounded border-gray-300 text-primary-600 shadow-sm focus:ring-primary-200"
                                     />
                                     <span class="ml-2 text-sm text-gray-600">Usuario activo</span>
                                 </label>
                                 <InputError :message="form.errors.active" class="mt-2" />
                             </div>
 
-                            <div class="flex items-center justify-end gap-4">
-                                <Link :href="route('admin.users.index')" class="text-gray-600 hover:text-gray-900">
+                            <div class="flex items-center justify-end gap-4 border-t border-gray-100 pt-4">
+                                <Link :href="route('admin.users.index')" class="text-sm font-medium text-gray-600 hover:text-gray-900">
                                     Cancelar
                                 </Link>
                                 <PrimaryButton :disabled="form.processing">
@@ -105,7 +103,7 @@ const submit = () => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

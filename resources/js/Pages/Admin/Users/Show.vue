@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import Card from '@/Components/Card.vue';
 
 defineProps({
     user: Object,
@@ -12,19 +13,16 @@ defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Detalle de Usuario
                 </h2>
-                <Link :href="route('admin.users.index')" class="text-blue-600 hover:text-blue-900">
-                    Volver al listado
-                </Link>
             </div>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <div class="grid grid-cols-1 gap-6">
                             <div>
@@ -75,19 +73,16 @@ defineProps({
                             </div>
                         </div>
 
-                        <div class="mt-6 flex items-center gap-4">
+                        <div class="mt-6 flex items-center gap-4 border-t border-gray-100 pt-4">
                             <Link :href="route('admin.users.edit', user.id)" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/50 transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl hover:shadow-primary-500/50 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-95">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                                 Editar Usuario
                             </Link>
-                            <Link :href="route('admin.users.index')" class="text-gray-600 hover:text-gray-900">
-                                Volver al listado
-                            </Link>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

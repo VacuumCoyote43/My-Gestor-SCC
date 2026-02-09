@@ -6,6 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import { Head, useForm } from '@inertiajs/vue3';
+import Card from '@/Components/Card.vue';
 
 const form = useForm({
     nombre_legal: '',
@@ -25,14 +26,14 @@ const submit = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight">
+            <h2 class="text-xl font-semibold leading-tight text-gray-900">
                 Nuevo Proveedor
             </h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <form @submit.prevent="submit" class="space-y-6">
                             <div>
@@ -78,7 +79,7 @@ const submit = () => {
                                     id="direccion"
                                     v-model="form.direccion"
                                     rows="3"
-                                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                 ></textarea>
                                 <InputError class="mt-2" :message="form.errors.direccion" />
                             </div>
@@ -89,14 +90,14 @@ const submit = () => {
                                 <InputError class="mt-2" :message="form.errors.es_liga" />
                             </div>
 
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-4 border-t border-gray-100 pt-4">
                                 <PrimaryButton :disabled="form.processing">
                                     Crear Proveedor
                                 </PrimaryButton>
                             </div>
                         </form>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

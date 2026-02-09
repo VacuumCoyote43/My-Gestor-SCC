@@ -1,6 +1,18 @@
 <script setup>
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+const page = usePage();
+
+const showBackButton = computed(() => {
+    const component = page.component || '';
+    return !component.endsWith('/Index');
+});
+
+const goBack = () => {
+    window.history.back();
+};
 </script>
 
 <template>
@@ -13,9 +25,7 @@ import { Link } from '@inertiajs/vue3';
             </Link>
         </div>
 
-        <div
-            class="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg"
-        >
+        <div class="mt-6 sm:mt-0 overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg rounded-xl">
             <slot />
         </div>
     </div>

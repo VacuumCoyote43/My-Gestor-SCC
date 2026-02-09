@@ -1,13 +1,22 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SearchFilter from '@/Components/SearchFilter.vue';
-import Card from '@/Components/Card.vue';
+import DataTable from '@/Components/DataTable.vue';
+import Pagination from '@/Components/Pagination.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     proveedores: Object,
     filters: Object,
 });
+
+const columns = [
+    { key: 'nombre_legal', label: 'Nombre Legal', sortable: true },
+    { key: 'nif_cif', label: 'NIF/CIF', sortable: true },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'es_liga', label: 'Tipo', sortable: false },
+    { key: 'actions', label: 'Acciones', sortable: false, class: 'text-right', rowClass: 'text-right' },
+];
 </script>
 
 <template>
@@ -15,7 +24,7 @@ defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-4">
                 <h2 class="text-xl font-semibold leading-tight">
                     Gestión de Proveedores
                 </h2>
@@ -37,62 +46,36 @@ defineProps({
                     placeholder="Buscar proveedores por nombre o NIF/CIF..."
                 />
 
-                <Card :padding="false">
-                    <div class="p-6">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre Legal</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">NIF/CIF</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="proveedor in proveedores.data" :key="proveedor.id">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            {{ proveedor.nombre_legal }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ proveedor.nif_cif }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ proveedor.email }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span v-if="proveedor.es_liga" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                                                Liga
-                                            </span>
-                                            <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                Proveedor
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
-                                            <Link :href="route('admin.proveedores.edit', proveedor.id)" class="text-blue-600 hover:text-blue-900 mr-3">
-                                                Editar
-                                            </Link>
-                                            <Link :href="route('admin.proveedores.show', proveedor.id)" class="text-green-600 hover:text-green-900">
-                                                Ver
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Paginación -->
-                        <div v-if="proveedores.links" class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-700">
-                                Mostrando {{ proveedores.from }} a {{ proveedores.to }} de {{ proveedores.total }} resultados
-                            </div>
-                            <div class="flex gap-1">
-                                <component v-for="link in proveedores.links" :key="link.label" :is="link.url ? Link : 'span'" :href="link.url" :class="link.active ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'" class="px-3 py-2 text-sm border rounded" v-html="link.label"></component>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
+                <DataTable :rows="proveedores" :columns="columns" :filters="filters" route-name="admin.proveedores.index">
+                    <template #cell-nombre_legal="{ row }">
+                        <span class="font-semibold text-gray-900">{{ row.nombre_legal }}</span>
+                    </template>
+                    <template #cell-nif_cif="{ row }">
+                        <span class="text-gray-500">{{ row.nif_cif }}</span>
+                    </template>
+                    <template #cell-email="{ row }">
+                        <span class="text-gray-500">{{ row.email }}</span>
+                    </template>
+                    <template #cell-es_liga="{ row }">
+                        <span v-if="row.es_liga" class="inline-flex rounded-full bg-purple-100 px-2 text-xs font-semibold leading-5 text-purple-800">
+                            Liga
+                        </span>
+                        <span v-else class="inline-flex rounded-full bg-gray-100 px-2 text-xs font-semibold leading-5 text-gray-800">
+                            Proveedor
+                        </span>
+                    </template>
+                    <template #cell-actions="{ row }">
+                        <Link :href="route('admin.proveedores.edit', row.id)" class="mr-3 text-sm font-medium text-blue-600 transition hover:text-blue-900">
+                            Editar
+                        </Link>
+                        <Link :href="route('admin.proveedores.show', row.id)" class="text-sm font-medium text-green-600 transition hover:text-green-900">
+                            Ver
+                        </Link>
+                    </template>
+                    <template #pagination="{ links }">
+                        <Pagination :links="links" />
+                    </template>
+                </DataTable>
             </div>
         </div>
     </AuthenticatedLayout>

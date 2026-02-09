@@ -6,6 +6,7 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { ref } from 'vue';
+import Card from '@/Components/Card.vue';
 
 const props = defineProps({
     club: Object,
@@ -64,19 +65,16 @@ const submit = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Nueva Factura{{ club ? ' - ' + club.nombre : '' }}
                 </h2>
-                <Link :href="route('club.facturas.index')" class="text-blue-600 hover:text-blue-900">
-                    Volver al listado
-                </Link>
             </div>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-4xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <form @submit.prevent="submit">
                             <!-- Receptor -->
@@ -85,7 +83,7 @@ const submit = () => {
                                 <select
                                     id="receptor_type"
                                     v-model="form.receptor_type"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                     required
                                 >
                                     <option value="proveedor">Proveedor</option>
@@ -99,7 +97,7 @@ const submit = () => {
                                 <select
                                     id="receptor_id"
                                     v-model="form.receptor_id"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                     required
                                 >
                                     <option value="">Selecciona un receptor</option>
@@ -159,12 +157,12 @@ const submit = () => {
                             <div class="mb-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <InputLabel value="Conceptos *" />
-                                    <button type="button" @click="agregarConcepto" class="text-sm text-blue-600 hover:text-blue-800">
+                                    <button type="button" @click="agregarConcepto" class="text-sm font-medium text-primary-600 hover:text-primary-800">
                                         + Agregar concepto
                                     </button>
                                 </div>
 
-                                <div v-for="(concepto, index) in form.conceptos" :key="index" class="p-4 mb-4 border border-gray-200 rounded-lg">
+                                <div v-for="(concepto, index) in form.conceptos" :key="index" class="mb-4 rounded-xl border border-gray-200 bg-gray-50/60 p-4">
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
                                         <div class="md:col-span-2">
                                             <InputLabel :for="'descripcion_' + index" value="Descripción" />
@@ -221,7 +219,7 @@ const submit = () => {
                                         <span class="text-sm font-medium text-gray-700">
                                             Total línea: {{ concepto.total_linea.toFixed(2) }} €
                                         </span>
-                                        <button v-if="form.conceptos.length > 1" type="button" @click="eliminarConcepto(index)" class="text-sm text-red-600 hover:text-red-800">
+                                        <button v-if="form.conceptos.length > 1" type="button" @click="eliminarConcepto(index)" class="text-sm font-medium text-red-600 hover:text-red-800">
                                             Eliminar
                                         </button>
                                     </div>
@@ -229,7 +227,7 @@ const submit = () => {
                             </div>
 
                             <!-- Total -->
-                            <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                            <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
                                 <div class="text-right">
                                     <span class="text-lg font-bold text-gray-900">
                                         Total Factura: {{ calcularTotal().toFixed(2) }} €
@@ -247,7 +245,7 @@ const submit = () => {
                                     @change="handleFileChange"
                                     accept="image/*,.pdf"
                                     multiple
-                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100"
                                 />
                                 <p class="mt-1 text-xs text-gray-500">
                                     Puedes subir varios archivos (imágenes o PDF). Máximo 6MB por archivo.
@@ -255,8 +253,8 @@ const submit = () => {
                                 <InputError :message="form.errors.archivos" class="mt-2" />
                             </div>
 
-                            <div class="flex items-center justify-end gap-4">
-                                <Link :href="route('club.facturas.index')" class="text-gray-600 hover:text-gray-900">
+                            <div class="flex items-center justify-end gap-4 border-t border-gray-100 pt-4">
+                                <Link :href="route('club.facturas.index')" class="text-sm font-medium text-gray-600 hover:text-gray-900">
                                     Cancelar
                                 </Link>
                                 <PrimaryButton :disabled="form.processing">
@@ -265,7 +263,7 @@ const submit = () => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

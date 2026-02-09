@@ -1,13 +1,22 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SearchFilter from '@/Components/SearchFilter.vue';
-import Card from '@/Components/Card.vue';
+import DataTable from '@/Components/DataTable.vue';
+import Pagination from '@/Components/Pagination.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     clubes: Object,
     filters: Object,
 });
+
+const columns = [
+    { key: 'nombre', label: 'Nombre', sortable: true },
+    { key: 'cif', label: 'CIF', sortable: true },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'created_at', label: 'Creado', sortable: true },
+    { key: 'actions', label: 'Acciones', sortable: false, class: 'text-right', rowClass: 'text-right' },
+];
 </script>
 
 <template>
@@ -15,7 +24,7 @@ defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-4">
                 <h2 class="text-xl font-semibold leading-tight">
                     Gestión de Clubes
                 </h2>
@@ -37,57 +46,31 @@ defineProps({
                     placeholder="Buscar clubes por nombre o CIF..."
                 />
 
-                <Card :padding="false">
-                    <div class="p-6">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">CIF</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Creado</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="club in clubes.data" :key="club.id">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            {{ club.nombre }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ club.cif || '-' }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ club.email || '-' }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ new Date(club.created_at).toLocaleDateString('es-ES') }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
-                                            <Link :href="route('admin.clubes.edit', club.id)" class="text-blue-600 hover:text-blue-900 mr-3">
-                                                Editar
-                                            </Link>
-                                            <Link :href="route('admin.clubes.show', club.id)" class="text-green-600 hover:text-green-900">
-                                                Ver
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Paginación -->
-                        <div v-if="clubes.links" class="flex justify-between items-center mt-4">
-                            <div class="text-sm text-gray-700">
-                                Mostrando {{ clubes.from }} a {{ clubes.to }} de {{ clubes.total }} resultados
-                            </div>
-                            <div class="flex gap-1">
-                                <component v-for="link in clubes.links" :key="link.label" :is="link.url ? Link : 'span'" :href="link.url" :class="link.active ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'" class="px-3 py-2 text-sm border rounded" v-html="link.label"></component>
-                            </div>
-                        </div>
-                    </div>
-                </Card>
+                <DataTable :rows="clubes" :columns="columns" :filters="filters" route-name="admin.clubes.index">
+                    <template #cell-nombre="{ row }">
+                        <span class="font-semibold text-gray-900">{{ row.nombre }}</span>
+                    </template>
+                    <template #cell-cif="{ row }">
+                        <span class="text-gray-500">{{ row.cif || '-' }}</span>
+                    </template>
+                    <template #cell-email="{ row }">
+                        <span class="text-gray-500">{{ row.email || '-' }}</span>
+                    </template>
+                    <template #cell-created_at="{ row }">
+                        <span class="text-gray-500">{{ new Date(row.created_at).toLocaleDateString('es-ES') }}</span>
+                    </template>
+                    <template #cell-actions="{ row }">
+                        <Link :href="route('admin.clubes.edit', row.id)" class="mr-3 text-sm font-medium text-blue-600 transition hover:text-blue-900">
+                            Editar
+                        </Link>
+                        <Link :href="route('admin.clubes.show', row.id)" class="text-sm font-medium text-green-600 transition hover:text-green-900">
+                            Ver
+                        </Link>
+                    </template>
+                    <template #pagination="{ links }">
+                        <Pagination :links="links" />
+                    </template>
+                </DataTable>
             </div>
         </div>
     </AuthenticatedLayout>

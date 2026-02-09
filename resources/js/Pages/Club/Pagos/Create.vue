@@ -6,6 +6,7 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { ref } from 'vue';
+import Card from '@/Components/Card.vue';
 
 const props = defineProps({
     factura: Object,
@@ -16,14 +17,14 @@ const form = useForm({
     importe: '',
     fecha_pago: new Date().toISOString().split('T')[0],
     metodo_pago: 'transferencia',
-    justificacion: null,
+    archivos: [],
 });
 
 const fileInput = ref(null);
 
 const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
-    form.justificacion = files;
+    form.archivos = files;
 };
 
 const submit = () => {
@@ -45,20 +46,17 @@ const formatCurrency = (value) => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Registrar Pago a Factura
                 </h2>
-                <Link :href="route('club.facturas-recibidas.show', factura.id)" class="text-blue-600 hover:text-blue-900">
-                    Volver a la factura
-                </Link>
             </div>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
                 <!-- Información de la factura -->
-                <div class="mb-6 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card class="mb-6">
                     <div class="p-6">
                         <h3 class="mb-4 text-lg font-semibold text-gray-900">Información de la Factura</h3>
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -76,18 +74,18 @@ const formatCurrency = (value) => {
                             </div>
                             <div>
                                 <div class="text-sm font-medium text-gray-500">Total Pagado</div>
-                                <div class="mt-1 text-lg text-green-600">{{ formatCurrency(factura.total_pagado || 0) }}</div>
+                                <div class="mt-1 text-lg text-green-600">{{ formatCurrency(factura.total_pagado_registrado ?? factura.total_pagado ?? 0) }}</div>
                             </div>
                             <div>
                                 <div class="text-sm font-medium text-gray-500">Pendiente</div>
-                                <div class="mt-1 text-lg font-bold text-red-600">{{ formatCurrency(factura.total - (factura.total_pagado || 0)) }}</div>
+                                <div class="mt-1 text-lg font-bold text-red-600">{{ formatCurrency(factura.total - (factura.total_pagado_registrado ?? factura.total_pagado ?? 0)) }}</div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 <!-- Formulario de pago -->
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <h3 class="mb-4 text-lg font-semibold text-gray-900">Datos del Pago</h3>
                         
@@ -100,12 +98,12 @@ const formatCurrency = (value) => {
                                     type="number"
                                     step="0.01"
                                     min="0.01"
-                                    :max="factura.total - (factura.total_pagado || 0)"
+                                    :max="factura.total - (factura.total_pagado_registrado ?? factura.total_pagado ?? 0)"
                                     class="mt-1 block w-full"
                                     required
                                 />
                                 <p class="mt-1 text-xs text-gray-500">
-                                    Máximo: {{ formatCurrency(factura.total - (factura.total_pagado || 0)) }}
+                                    Máximo: {{ formatCurrency(factura.total - (factura.total_pagado_registrado ?? factura.total_pagado ?? 0)) }}
                                 </p>
                                 <InputError :message="form.errors.importe" class="mt-2" />
                             </div>
@@ -127,7 +125,7 @@ const formatCurrency = (value) => {
                                 <select
                                     id="metodo_pago"
                                     v-model="form.metodo_pago"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                     required
                                 >
                                     <option value="transferencia">Transferencia Bancaria</option>
@@ -148,13 +146,13 @@ const formatCurrency = (value) => {
                                     @change="handleFileChange"
                                     accept="image/*,.pdf"
                                     multiple
-                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100"
                                     required
                                 />
                                 <p class="mt-1 text-xs text-gray-500">
                                     Puedes subir varios archivos (imágenes o PDF). Máximo 6MB por archivo.
                                 </p>
-                                <InputError :message="form.errors.justificacion" class="mt-2" />
+                                <InputError :message="form.errors.archivos" class="mt-2" />
                             </div>
 
                             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
@@ -173,8 +171,8 @@ const formatCurrency = (value) => {
                                 </div>
                             </div>
 
-                            <div class="flex items-center justify-end gap-4">
-                                <Link :href="route('club.facturas-recibidas.show', factura.id)" class="text-gray-600 hover:text-gray-900">
+                            <div class="flex items-center justify-end gap-4 border-t border-gray-100 pt-4">
+                                <Link :href="route('club.facturas-recibidas.show', factura.id)" class="text-sm font-medium text-gray-600 hover:text-gray-900">
                                     Cancelar
                                 </Link>
                                 <PrimaryButton :disabled="form.processing">
@@ -183,7 +181,7 @@ const formatCurrency = (value) => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

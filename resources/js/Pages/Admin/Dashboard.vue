@@ -14,12 +14,12 @@ defineProps({
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold">
                         Dashboard Administrador
                     </h2>
-                    <p class="mt-1 text-primary-100">
+                    <p class="mt-1 text-gray-600">
                         Visión general del sistema
                     </p>
                 </div>

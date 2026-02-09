@@ -7,6 +7,7 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import Card from '@/Components/Card.vue';
 
 const props = defineProps({
     clubes: Array,
@@ -64,14 +65,14 @@ const submit = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-white">
+            <h2 class="text-xl font-semibold leading-tight text-gray-900">
                 Nueva Factura
             </h2>
         </template>
 
-        <div class="py-12">
+        <div class="py-10">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <Card>
                     <div class="p-6">
                         <form @submit.prevent="submit" class="space-y-6">
                             <!-- Datos básicos -->
@@ -120,7 +121,7 @@ const submit = () => {
                                         id="receptor_type"
                                         v-model="form.receptor_type"
                                         @change="updateReceptores"
-                                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                         required
                                     >
                                         <option value="App\Models\Club">Club</option>
@@ -134,7 +135,7 @@ const submit = () => {
                                     <select
                                         id="receptor_id"
                                         v-model="form.receptor_id"
-                                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    class="mt-1 block w-full rounded-lg border-gray-200 bg-gray-50 shadow-sm focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-200"
                                         required
                                     >
                                         <option :value="null">Seleccione...</option>
@@ -155,7 +156,7 @@ const submit = () => {
                                     </SecondaryButton>
                                 </div>
 
-                                <div v-for="(concepto, index) in form.conceptos" :key="index" class="p-4 mb-4 border border-gray-200 rounded-lg">
+                                <div v-for="(concepto, index) in form.conceptos" :key="index" class="mb-4 rounded-xl border border-gray-200 bg-gray-50/60 p-4">
                                     <div class="grid grid-cols-1 gap-4 md:grid-cols-6">
                                         <div class="md:col-span-2">
                                             <InputLabel :for="`descripcion_${index}`" value="Descripción *" />
@@ -222,7 +223,7 @@ const submit = () => {
                                             v-if="form.conceptos.length > 1"
                                             type="button"
                                             @click="eliminarConcepto(index)"
-                                            class="text-sm text-red-600 hover:text-red-900"
+                                            class="text-sm font-medium text-red-600 hover:text-red-900"
                                         >
                                             Eliminar concepto
                                         </button>
@@ -240,20 +241,20 @@ const submit = () => {
                                     type="file"
                                     multiple
                                     @change="handleFileChange"
-                                    class="block w-full mt-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-primary-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-700 hover:file:bg-primary-100"
                                 />
                                 <InputError class="mt-2" :message="form.errors.archivos" />
                             </div>
 
                             <!-- Botones -->
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-4 border-t border-gray-100 pt-4">
                                 <PrimaryButton :disabled="form.processing">
                                     Crear Factura (Borrador)
                                 </PrimaryButton>
                             </div>
                         </form>
                     </div>
-                </div>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

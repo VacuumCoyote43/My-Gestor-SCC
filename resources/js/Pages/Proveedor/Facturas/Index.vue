@@ -1,7 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import SearchFilter from '@/Components/SearchFilter.vue';
-import Card from '@/Components/Card.vue';
+import DataTable from '@/Components/DataTable.vue';
+import Pagination from '@/Components/Pagination.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -12,6 +13,15 @@ const props = defineProps({
 
 const estadoFilter = ref(props.filters.estado || '');
 const mesFilter = ref(props.filters.mes || '');
+
+const columns = [
+    { key: 'numero', label: 'Número', sortable: true },
+    { key: 'receptor', label: 'Receptor', sortable: false },
+    { key: 'fecha_factura', label: 'Fecha', sortable: true },
+    { key: 'total', label: 'Total', sortable: true, class: 'text-right', rowClass: 'text-right font-medium' },
+    { key: 'estado', label: 'Estado', sortable: true },
+    { key: 'actions', label: 'Acciones', sortable: false, class: 'text-right', rowClass: 'text-right' },
+];
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('es-ES', {
@@ -59,8 +69,8 @@ const applyFilters = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Facturas Emitidas
                 </h2>
                 <Link :href="route('proveedor.facturas.create')" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/50 transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl hover:shadow-primary-500/50 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-95">
@@ -124,54 +134,33 @@ const applyFilters = () => {
                     </template>
                 </SearchFilter>
 
-                <Card :padding="false">
-                    <div class="p-6">
-                        <!-- TODO: Agregar filtros -->
-                        
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Número</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Receptor</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Total</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
-                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="factura in facturas.data" :key="factura.id">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            {{ factura.numero }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ factura.receptor?.nombre || factura.receptor?.nombre_legal }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ new Date(factura.fecha_factura).toLocaleDateString('es-ES') }}
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right text-gray-900 whitespace-nowrap">
-                                            {{ formatCurrency(factura.total) }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="getEstadoBadgeClass(factura.estado)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                                {{ getEstadoLabel(factura.estado) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
-                                            <Link :href="route('proveedor.facturas.show', factura.id)" class="text-blue-600 hover:text-blue-900">
-                                                Ver
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- TODO: Agregar paginación -->
-                    </div>
-                </Card>
+                <DataTable :rows="facturas" :columns="columns" :filters="filters" route-name="proveedor.facturas.index" :sticky-header="true">
+                    <template #cell-numero="{ row }">
+                        <span class="font-semibold text-gray-900">{{ row.numero }}</span>
+                    </template>
+                    <template #cell-receptor="{ row }">
+                        <span class="text-gray-600">{{ row.receptor?.nombre || row.receptor?.nombre_legal }}</span>
+                    </template>
+                    <template #cell-fecha_factura="{ value }">
+                        {{ new Date(value).toLocaleDateString('es-ES') }}
+                    </template>
+                    <template #cell-total="{ value }">
+                        <span class="font-semibold text-gray-900">{{ formatCurrency(value) }}</span>
+                    </template>
+                    <template #cell-estado="{ row }">
+                        <span :class="getEstadoBadgeClass(row.estado)" class="inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                            {{ getEstadoLabel(row.estado) }}
+                        </span>
+                    </template>
+                    <template #cell-actions="{ row }">
+                        <Link :href="route('proveedor.facturas.show', row.id)" class="text-sm font-medium text-blue-600 transition hover:text-blue-900">
+                            Ver
+                        </Link>
+                    </template>
+                    <template #pagination="{ links }">
+                        <Pagination :links="links" />
+                    </template>
+                </DataTable>
             </div>
         </div>
     </AuthenticatedLayout>

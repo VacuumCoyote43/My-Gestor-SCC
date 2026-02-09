@@ -47,7 +47,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('users/{user}/login-as', [App\Http\Controllers\Admin\UserController::class, 'loginAs'])->name('users.login-as');
     
     // Gestión de clubes
-    Route::resource('clubes', App\Http\Controllers\Admin\ClubController::class);
+    Route::resource('clubes', App\Http\Controllers\Admin\ClubController::class)
+        ->parameters(['clubes' => 'club']);
     
     // Gestión de proveedores
     Route::resource('proveedores', App\Http\Controllers\Admin\ProveedorController::class)

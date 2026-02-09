@@ -4,37 +4,35 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import Checkbox from '@/Components/Checkbox.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import Card from '@/Components/Card.vue';
 
 const props = defineProps({
-    proveedor: {
+    club: {
         type: Object,
         required: true,
     },
 });
 
 const form = useForm({
-    nombre_legal: props.proveedor?.nombre_legal || '',
-    nif_cif: props.proveedor?.nif_cif || '',
-    email: props.proveedor?.email || '',
-    direccion: props.proveedor?.direccion || '',
-    es_liga: props.proveedor?.es_liga || false,
+    nombre: props.club?.nombre || '',
+    cif: props.club?.cif || '',
+    email: props.club?.email || '',
+    direccion: props.club?.direccion || '',
 });
 
 const submit = () => {
-    form.put(route('admin.proveedores.update', props.proveedor.id));
+    form.put(route('admin.clubes.update', props.club.id));
 };
 </script>
 
 <template>
-    <Head title="Editar Proveedor" />
+    <Head title="Editar Club" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-900">
-                Editar Proveedor: {{ proveedor.nombre_legal }}
+                Editar Club: {{ club.nombre }}
             </h2>
         </template>
 
@@ -44,38 +42,36 @@ const submit = () => {
                     <div class="p-6">
                         <form @submit.prevent="submit" class="space-y-6">
                             <div>
-                                <InputLabel for="nombre_legal" value="Nombre Legal *" />
+                                <InputLabel for="nombre" value="Nombre *" />
                                 <TextInput
-                                    id="nombre_legal"
-                                    v-model="form.nombre_legal"
+                                    id="nombre"
+                                    v-model="form.nombre"
                                     type="text"
                                     class="block w-full mt-1"
                                     required
                                     autofocus
                                 />
-                                <InputError class="mt-2" :message="form.errors.nombre_legal" />
+                                <InputError class="mt-2" :message="form.errors.nombre" />
                             </div>
 
                             <div>
-                                <InputLabel for="nif_cif" value="NIF/CIF *" />
+                                <InputLabel for="cif" value="CIF" />
                                 <TextInput
-                                    id="nif_cif"
-                                    v-model="form.nif_cif"
+                                    id="cif"
+                                    v-model="form.cif"
                                     type="text"
                                     class="block w-full mt-1"
-                                    required
                                 />
-                                <InputError class="mt-2" :message="form.errors.nif_cif" />
+                                <InputError class="mt-2" :message="form.errors.cif" />
                             </div>
 
                             <div>
-                                <InputLabel for="email" value="Email *" />
+                                <InputLabel for="email" value="Email" />
                                 <TextInput
                                     id="email"
                                     v-model="form.email"
                                     type="email"
                                     class="block w-full mt-1"
-                                    required
                                 />
                                 <InputError class="mt-2" :message="form.errors.email" />
                             </div>
@@ -91,15 +87,9 @@ const submit = () => {
                                 <InputError class="mt-2" :message="form.errors.direccion" />
                             </div>
 
-                            <div class="flex items-center gap-2">
-                                <Checkbox id="es_liga" v-model:checked="form.es_liga" />
-                                <InputLabel for="es_liga" value="Es la Liga" class="cursor-pointer" />
-                                <InputError class="mt-2" :message="form.errors.es_liga" />
-                            </div>
-
                             <div class="flex items-center gap-4 border-t border-gray-100 pt-4">
                                 <PrimaryButton :disabled="form.processing">
-                                    Actualizar Proveedor
+                                    Actualizar Club
                                 </PrimaryButton>
                             </div>
                         </form>

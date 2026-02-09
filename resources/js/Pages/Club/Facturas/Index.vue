@@ -74,8 +74,8 @@ const applyFilters = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold leading-tight text-white">
+            <div class="flex items-center justify-between gap-4">
+                <h2 class="text-xl font-semibold leading-tight text-gray-900">
                     Facturas Emitidas{{ club ? ' - ' + club.nombre : '' }}
                 </h2>
                 <Link :href="route('club.facturas.create')" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/50 transition-all duration-200 hover:from-primary-700 hover:to-primary-800 hover:shadow-xl hover:shadow-primary-500/50 focus:outline-none focus:ring-4 focus:ring-primary-300 active:scale-95">
@@ -145,6 +145,7 @@ const applyFilters = () => {
                     :columns="columns"
                     :filters="filters"
                     route-name="club.facturas.index"
+                    :sticky-header="true"
                 >
                     <template #cell-numero="{ row }">
                         <span class="font-medium text-gray-900">{{ row.numero || 'BORRADOR' }}</span>
