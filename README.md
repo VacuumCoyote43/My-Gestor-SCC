@@ -34,7 +34,7 @@ DB_USERNAME=usuario
 DB_PASSWORD=clave
 ```
 
-4) Genera la key y corre migraciones:
+4) Genera la key y ejecuta migraciones:
 
 ```bash
 php artisan key:generate
