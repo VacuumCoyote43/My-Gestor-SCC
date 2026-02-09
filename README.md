@@ -34,11 +34,12 @@ DB_USERNAME=usuario
 DB_PASSWORD=clave
 ```
 
-4) Genera la key y ejecuta migraciones:
+4) Genera la key, ejecuta migraciones y seeders:
 
 ```bash
 php artisan key:generate
 php artisan migrate
+php artisan db:seed
 ```
 
 5) Instala dependencias frontend y compila:
@@ -91,6 +92,15 @@ Configura el servidor web para apuntar al directorio `public/`.
 ```bash
 composer test
 ```
+
+## Seeders y usuarios de prueba
+
+Los seeders crean roles y usuarios demo. Credenciales por defecto:
+
+- Admin: `admin@mgscc.local` / `password`
+- Proveedor: `proveedor@example.com` / `password`
+- Gestor club: `gestor@club.com` / `password`
+- Jugador: `jugador@demo.com` / `password`
 
 ## Notas utiles
 
